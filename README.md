@@ -2,7 +2,42 @@
 
 ## 1. CREAR BASE DE DATOS
 
-Utiliza el fichero nba.sql para crear la base de datos en MySQL. Tomate unos minutos para
+Utiliza el fichero nba.sql para crear la base de datos en MySQL. 
+
+```bash
+elarreglador@G9:~$ mysql -u miUsuario -p
+Enter password: *******
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 1012
+Server version: 8.0.40-0ubuntu0.22.04.1 (Ubuntu)
+
+Copyright (c) 2000, 2024, Oracle and/or its affiliates.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> SOURCE /home/elarreglador/Escritorio/CFS DAM/2024-2025 2CFS DAM/2CFS AD/SEGUNDO PARCIAL/eclipse-workspace2023-09/UD04_03Tenis/nba.sql
+Query OK, 1 row affected (0,02 sec)
+
+Database changed
+Query OK, 0 rows affected (0,07 sec)
+
+Query OK, 1 row affected (0,02 sec)
+
+[...]
+
+Query OK, 1 row affected (0,02 sec)
+
+Query OK, 1 row affected (0,01 sec)
+
+mysql>
+```
+
+
+Tomate unos minutos para
 entender el esquema.
 
 <table>
