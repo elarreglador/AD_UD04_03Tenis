@@ -5,6 +5,12 @@
 Utiliza el fichero nba.sql para crear la base de datos en MySQL. Tomate unos minutos para
 entender el esquema.
 
+<table>
+  <tr>
+    <td><img src="https://github.com/elarreglador/AD_UD04_03Tenis/blob/main/BD.png" alt="Esquema de base de datos" width="800" title="HomeScreen"></td>
+  </tr>
+</table>
+
 ## 2. MAPEA LA DB USANDO HIBERNATE
 
 Configura un nuevo Proyecto y utiliza Hibernate para mapear la base de datos.
