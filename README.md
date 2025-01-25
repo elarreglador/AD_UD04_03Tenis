@@ -7,7 +7,7 @@ entender el esquema.
 
 <table>
   <tr>
-    <td><img src="https://github.com/elarreglador/AD_UD04_03Tenis/blob/main/BD.png" alt="Esquema de base de datos" width="800" title="HomeScreen"></td>
+    <td><img src="https://github.com/elarreglador/AD_UD04_03Tenis/blob/main/BD.png" alt="Esquema de base de datos" title="HomeScreen"></td>
   </tr>
 </table>
 
