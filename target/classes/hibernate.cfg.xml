@@ -14,6 +14,7 @@
         <property name="hibernate.hbm2ddl.auto">none</property>
         <property name="hibernate.search.autoregister_listeners">true</property>
         <property name="hibernate.validator.apply_to_ddl">false</property>
+        <mapping class="UD04_03Tenis.entity.Players" />
         <mapping class="UD04_03Tenis.entity.Stats" />
         <mapping class="UD04_03Tenis.entity.Matches" />
         <mapping class="UD04_03Tenis.entity.Teams" />

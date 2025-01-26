@@ -6,6 +6,9 @@ import javax.persistence.AttributeOverrides;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 
@@ -29,6 +32,9 @@ public class Stats implements java.io.Serializable {
 	private Float blocksPerMatch;
 	@Column(name = "Rebound_per_match", precision = 12, scale = 0)
 	private Float reboundPerMatch;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "player", referencedColumnName = "code", insertable = false, updatable = false)
+	private Players players;
 
 	public Stats() {}
 
