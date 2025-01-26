@@ -154,6 +154,41 @@ public static void muestraJugador(Scanner teclado, SessionFactory sf) {
 
 Implementa el método muestraJugadoresEnEquipo(). Preguntará por la ID de un equipo y mostrará a los jugadores asociados a este. Si no existe un equipo con esa ID, se deberá mostrar un mensaje.
 
+```java
+public static void muestraJugadoresEnEquipo(
+			Scanner teclado, SessionFactory sf) {
+	// Pregunta por la ID de un equipo y mostrará a los jugadores 
+	// asociados a este. Si no existe un equipo con esa ID, se 
+	// deberá mostrar un mensaje.
+	
+	System.out.println("MUESTRA LOS JUGADORES DE UN EQUIPO EXISTENTE");
+	System.out.print("Introduce nombre (ID) de equipo: ");
+	String name = teclado.nextLine();
+	
+	if (Teams.existe(sf, name)) {
+		try ( Session session = sf.openSession() ){
+			Query<Players> query = session.createQuery(
+					"FROM Players P "
+					+ "WHERE P.teams.name = :team", Players.class);
+			query.setParameter("team", name);
+			List<Players> jugadores = query.list();
+			
+			System.out.println();
+			for (Players jugador : jugadores) {
+				System.out.println(jugador.getName());
+			}
+			System.out.println();
+			
+		} catch (Exception e) {
+			System.out.println("Excepcion: "+ e);
+		}
+	} else {
+		System.out.println("El equipo " + name + " no existe");
+		System.out.println();
+	}
+}
+```
+
 ## 4) Crea un nuevo equipo
 
 Implementa el método crearEquipo().Este preguntará los datos necesarios para crear el equipo y crear un objeto persistente en la base de datos.
