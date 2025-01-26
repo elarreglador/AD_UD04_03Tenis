@@ -98,6 +98,28 @@ public class Teams implements java.io.Serializable {
 				"\n conference = " + this.getConference();
 	}
 	
+	public static boolean existe(SessionFactory sf, String name) {
+	    // Verifica si existe un equipo
+	    boolean existe = false;
+	    try (Session session = sf.openSession()) {
+	        // Realizamos la consulta para verificar si existe un equipo con ese nombre
+	        Query<Teams> query = session.createQuery(
+	            "FROM Equipo E " +
+	            "WHERE E.nombre = :name", Teams.class);
+	        query.setParameter("name", name);
+
+	        List<Teams> equipos = query.list();
+	        if ( !equipos.isEmpty() ) {
+	        	existe = true;
+	        }
+	    } catch (Exception e) {
+	        System.err.println("Error al verificar la existencia del equipo: " + e.getMessage());
+	        e.printStackTrace();
+	    }
+	    return existe;
+	}
+
+	
 	public static void muestraEquipo(Scanner teclado, SessionFactory sf) {
 		/*
 		 Preguntará por una ID y devolverá el equipo con la ID 
@@ -106,7 +128,7 @@ public class Teams implements java.io.Serializable {
 		 */
 		System.out.print("Introduce nombre (ID) de equipo: ");
 		String name = teclado.nextLine();
-		
+				
 		try ( Session session = sf.openSession() ){
 			// Busqueda por aproximacion del nombre
 			// LIKE: name debe estar rodeado del caracter %
@@ -129,4 +151,8 @@ public class Teams implements java.io.Serializable {
             e.printStackTrace();
         }
 	}
+	
+public static void muestraJugadoresEnEquipo() {
+	
+}
 }
