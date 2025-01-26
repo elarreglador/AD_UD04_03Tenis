@@ -80,4 +80,13 @@ public class Stats implements java.io.Serializable {
 
 	public void setReboundPerMatch(Float reboundPerMatch) {
 		this.reboundPerMatch = reboundPerMatch;}
+	
+	@Override
+	public String toString() {
+		return "ID = " + this.getId() +
+				"asistenc. por partido = "+ this.getAssistancesPerMatch()+
+				"\n bloqueos por partido = " + this.getBlocksPerMatch() + 
+				"\n puntos por partido = " + this.getPointsPerMatch() + 
+				"\n rebotes por partido = " + this.getReboundPerMatch();
+	}
 }

@@ -2,6 +2,7 @@ import java.util.Scanner;
 
 import org.hibernate.SessionFactory;
 
+import UD04_03Tenis.entity.Players;
 import UD04_03Tenis.entity.Teams;
 
 
@@ -39,7 +40,7 @@ public class Main {
 						Teams.muestraEquipo(teclado, sf);
 						break;
 					case 2:
-						System.out.println("opcion 2");
+						Players.muestraJugador(teclado, sf);
 						break;
 					case 3:
 						System.out.println("opcion 3");
