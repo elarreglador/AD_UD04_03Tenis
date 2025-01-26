@@ -2,6 +2,8 @@ package UD04_03Tenis.entity;
 // Generated 26 ene 2025 12:30:14 by Hibernate Tools 4.3.6.Final
 
 import java.util.HashSet;
+import java.util.List;
+import java.util.Scanner;
 import java.util.Set;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -9,6 +11,11 @@ import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.query.Query;
+
 
 @Entity
 @Table(name = "teams", catalog = "NBA")
@@ -82,4 +89,39 @@ public class Teams implements java.io.Serializable {
 	public void setMatchesesForLocalTeam(
 			Set<Matches> matchesesForLocalTeam) {
 		this.matchesesForLocalTeam = matchesesForLocalTeam;}
+	
+	@Override
+	public String toString() {
+		return " name = " + this.name + 
+				"\n division = " + this.division +
+				"\n city = " + this.getCity() + 
+				"\n conference = " + this.getConference();
+	}
+	
+	public static void muestraEquipo(Scanner teclado, SessionFactory sf) {
+		System.out.print("Introduce nombre (ID) de equipo: ");
+		String name = teclado.nextLine();
+		
+		try ( Session session = sf.openSession() ){
+			// Busqueda por aproximacion del nombre
+			// LIKE: name debe estar rodeado del caracter %
+			Query<Teams> query = session.createQuery(
+					"FROM Teams T " +
+					"WHERE T.name LIKE :name", Teams.class);
+			query.setParameter("name", "%" + name + "%");
+			List<Teams> equipos = query.list();
+			
+			if (!equipos.isEmpty()) {
+				Teams equipo = equipos.get(0);
+				System.out.println("\n" + equipo + "\n");
+			} else {
+				System.out.println("No existe el equipo " + name);
+			}
+			
+		} catch (Exception e) {
+            System.err.println("Error al ejecutar la consulta: " + 
+            		e.getMessage());
+            e.printStackTrace();
+        }
+	}
 }
