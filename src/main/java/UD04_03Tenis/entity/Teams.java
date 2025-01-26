@@ -99,6 +99,11 @@ public class Teams implements java.io.Serializable {
 	}
 	
 	public static void muestraEquipo(Scanner teclado, SessionFactory sf) {
+		/*
+		 Preguntará por una ID y devolverá el equipo con la ID 
+		 correspondiente por consola. Si no existe ningún equipo con 
+		 esa ID, se deberá mostrar un mensaje.
+		 */
 		System.out.print("Introduce nombre (ID) de equipo: ");
 		String name = teclado.nextLine();
 		
