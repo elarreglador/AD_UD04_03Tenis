@@ -80,6 +80,40 @@ Crea un programa con el siguiente menú:
 
 Implementa el método muestraEquipo(). Preguntará por una ID y devolverá el equipo con la ID correspondiente por consola. Si no existe ningún equipo con esa ID, se deberá mostrar un mensaje.
 
+```
+	public static void muestraEquipo(Scanner teclado, SessionFactory sf) {
+		/*
+		 Preguntará por una ID y devolverá el equipo con la ID 
+		 correspondiente por consola. Si no existe ningún equipo con 
+		 esa ID, se deberá mostrar un mensaje.
+		 */
+		System.out.print("Introduce nombre (ID) de equipo: ");
+		String name = teclado.nextLine();
+		
+		try ( Session session = sf.openSession() ){
+			// Busqueda por aproximacion del nombre
+			// LIKE: name debe estar rodeado del caracter %
+			Query<Teams> query = session.createQuery(
+					"FROM Teams T " +
+					"WHERE T.name LIKE :name", Teams.class);
+			query.setParameter("name", "%" + name + "%");
+			List<Teams> equipos = query.list();
+			
+			if (!equipos.isEmpty()) {
+				Teams equipo = equipos.get(0);
+				System.out.println("\n" + equipo + "\n");
+			} else {
+				System.out.println("No existe el equipo " + name);
+			}
+			
+		} catch (Exception e) {
+            System.err.println("Error al ejecutar la consulta: " + 
+            		e.getMessage());
+            e.printStackTrace();
+        }
+	}
+```
+
 ## 2) Muestra un jugador por ID
 
 Implementa el método muestraJugador().Este preguntará por la ID de un jugador y mostrará la información por pantalla. Si no existe el jugador, se deberá mostrar un mensaje.
