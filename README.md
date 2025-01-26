@@ -118,6 +118,38 @@ public static void muestraEquipo(Scanner teclado, SessionFactory sf) {
 
 Implementa el método muestraJugador().Este preguntará por la ID de un jugador y mostrará la información por pantalla. Si no existe el jugador, se deberá mostrar un mensaje.
 
+```java
+public static void muestraJugador(Scanner teclado, SessionFactory sf) {
+	/*
+	 Preguntará por la ID de un jugador y mostrará la información por
+	 pantalla. Si no existe el jugador, se deberá mostrar un mensaje.
+	 */
+	System.out.print("Introduce ID de jugador: ");
+	Integer num = teclado.nextInt();
+	teclado.nextLine(); // evita entradas fantasma
+	
+	try ( Session session = sf.openSession() ){
+		Query<Players> query = session.createQuery(
+				"FROM Players P " +
+				"WHERE P.code = :num", Players.class);
+		query.setParameter("num", num);
+		List<Players> jugadores = query.list();
+		
+		if (!jugadores.isEmpty()) {
+			Players jugador = jugadores.get(0);
+			System.out.println("\n" + jugador + "\n");
+		} else {
+			System.out.println("No existe el jugador " + num);
+		}
+		
+	} catch (Exception e) {
+        System.err.println("Error al ejecutar la consulta: " + 
+        		e.getMessage());
+        e.printStackTrace();
+    }
+}
+```
+
 ## 3) Muestra los jugadores de un equipo existente
 
 Implementa el método muestraJugadoresEnEquipo(). Preguntará por la ID de un equipo y mostrará a los jugadores asociados a este. Si no existe un equipo con esa ID, se deberá mostrar un mensaje.
