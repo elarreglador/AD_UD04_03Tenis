@@ -136,6 +136,7 @@ public class Players implements java.io.Serializable {
 		 Preguntará por la ID de un jugador y mostrará la información por
 		 pantalla. Si no existe el jugador, se deberá mostrar un mensaje.
 		 */
+		System.out.println("MUESTRA UN JUGADOR POR ID");
 		System.out.print("Introduce ID de jugador: ");
 		Integer num = teclado.nextInt();
 		teclado.nextLine(); // evita entradas fantasma

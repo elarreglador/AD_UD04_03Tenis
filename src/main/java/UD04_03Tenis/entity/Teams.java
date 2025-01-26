@@ -112,7 +112,6 @@ public class Teams implements java.io.Serializable {
 	        System.err.println("Error al verificar la existencia del equipo: " + e.getMessage());
 	        e.printStackTrace();
 	    }
-	    System.out.println("Teams.existe(sf," + name + ");");
 	    return false;
 	}
 
@@ -123,6 +122,7 @@ public class Teams implements java.io.Serializable {
 		 correspondiente por consola. Si no existe ningún equipo con 
 		 esa ID, se deberá mostrar un mensaje.
 		 */
+		System.out.println("MUESTRA UN EQUIPO POR ID");
 		System.out.print("Introduce nombre (ID) de equipo: ");
 		String name = teclado.nextLine();
 				
@@ -154,11 +154,27 @@ public class Teams implements java.io.Serializable {
 		// asociados a este. Si no existe un equipo con esa ID, se 
 		// deberá mostrar un mensaje.
 		
+		System.out.println("MUESTRA LOS JUGADORES DE UN EQUIPO EXISTENTE");
 		System.out.print("Introduce nombre (ID) de equipo: ");
 		String name = teclado.nextLine();
 		
 		if (Teams.existe(sf, name)) {
-			System.out.println("Existe!");
+			try ( Session session = sf.openSession() ){
+				Query<Players> query = session.createQuery(
+						"FROM Players P "
+						+ "WHERE P.teams.name = :team", Players.class);
+				query.setParameter("team", name);
+				List<Players> jugadores = query.list();
+				
+				System.out.println();
+				for (Players jugador : jugadores) {
+					System.out.println(jugador.getName());
+				}
+				System.out.println();
+				
+			} catch (Exception e) {
+				System.out.println("Excepcion: "+ e);
+			}
 		} else {
 			System.out.println("El equipo " + name + " no existe");
 			System.out.println();
