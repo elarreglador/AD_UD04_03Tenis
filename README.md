@@ -161,3 +161,7 @@ Cierra la app.
 Cuando implementes las funciones intenta crear funciones auxiliares para reutilizar código en común. Por ejemplo cuando borramos un equipo, la funcionalidad de borrar los jugadores se puede reutilizar. 
 
 Recuerda que la creación de una SessionFactory consume recursos, créala solamente una vez. Las funciones no deben recibir Session como argumento, cada función debe abrir su sesión, hacer un commit de las transacciones y cerrar la sesión.
+
+### Nota del alumno
+
+La base de datos es de jugadores de la NBA, el repositorio se llama UD04_03Tenis, 🔥yo solo quiero ver el mundo arder🔥
