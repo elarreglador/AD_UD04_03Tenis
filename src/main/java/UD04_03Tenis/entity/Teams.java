@@ -100,23 +100,20 @@ public class Teams implements java.io.Serializable {
 	
 	public static boolean existe(SessionFactory sf, String name) {
 	    // Verifica si existe un equipo
-	    boolean existe = false;
 	    try (Session session = sf.openSession()) {
 	        // Realizamos la consulta para verificar si existe un equipo con ese nombre
-	        Query<Teams> query = session.createQuery(
-	            "FROM Equipo E " +
-	            "WHERE E.nombre = :name", Teams.class);
-	        query.setParameter("name", name);
+	    	Query<Long> query = session.createQuery(
+	                "SELECT COUNT(T) FROM Teams T WHERE T.name = :name", Long.class);
+	            query.setParameter("name", name);
 
-	        List<Teams> equipos = query.list();
-	        if ( !equipos.isEmpty() ) {
-	        	existe = true;
-	        }
+	            Long count = query.uniqueResult(); // Devuelve el número de coincidencias
+	            return count != null && count > 0; // Existe si el conteo es mayor que 0
 	    } catch (Exception e) {
 	        System.err.println("Error al verificar la existencia del equipo: " + e.getMessage());
 	        e.printStackTrace();
 	    }
-	    return existe;
+	    System.out.println("Teams.existe(sf," + name + ");");
+	    return false;
 	}
 
 	
@@ -143,16 +140,30 @@ public class Teams implements java.io.Serializable {
 				System.out.println("\n" + equipo + "\n");
 			} else {
 				System.out.println("No existe el equipo " + name);
+				System.out.println();
 			}
 			
 		} catch (Exception e) {
-            System.err.println("Error al ejecutar la consulta: " + 
-            		e.getMessage());
-            e.printStackTrace();
+            System.err.println("muestraEquipo() Exception: " + e);
         }
 	}
 	
-public static void muestraJugadoresEnEquipo() {
-	
+	public static void muestraJugadoresEnEquipo(
+			Scanner teclado, SessionFactory sf) {
+		// Pregunta por la ID de un equipo y mostrará a los jugadores 
+		// asociados a este. Si no existe un equipo con esa ID, se 
+		// deberá mostrar un mensaje.
+		
+		System.out.print("Introduce nombre (ID) de equipo: ");
+		String name = teclado.nextLine();
+		
+		if (Teams.existe(sf, name)) {
+			System.out.println("Existe!");
+		} else {
+			System.out.println("El equipo " + name + " no existe");
+			System.out.println();
+		}
+	}
+
 }
-}
+

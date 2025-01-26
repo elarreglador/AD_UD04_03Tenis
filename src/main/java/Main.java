@@ -43,7 +43,7 @@ public class Main {
 						Players.muestraJugador(teclado, sf);
 						break;
 					case 3:
-						System.out.println("opcion 3");
+						Teams.muestraJugadoresEnEquipo(teclado, sf);
 						break;
 					case 4:
 						System.out.println("opcion 4");
