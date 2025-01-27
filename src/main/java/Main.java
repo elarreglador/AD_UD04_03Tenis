@@ -49,7 +49,9 @@ public class Main {
 						Teams.crearEquipo(teclado, sf);
 						break;
 					case 5:
-						System.out.println("opcion 5");
+						Players.guardaJugador(sf, 999, "Bulls", 
+								"Alejandro Dumas", "Boston", "6-7", 138, 
+								"A", 1200);
 						break;
 					case 6:
 						System.out.println("opcion 6");

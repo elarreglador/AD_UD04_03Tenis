@@ -16,6 +16,7 @@ import javax.persistence.Table;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.hibernate.query.Query;
 
 /**
@@ -51,6 +52,18 @@ public class Players implements java.io.Serializable {
 
 	public Players(int code) {
 		this.code = code;}
+	
+	public Players(int code, String name, String origin, 
+			String height, Integer weight, String position,
+			Integer salary) {
+		this.code = code;
+		this.teams = teams;
+		this.name = name;
+		this.origin = origin;
+		this.height = height;
+		this.weight = weight;
+		this.position = position;
+		this.salary = salary;}
 
 	public Players(int code, Teams teams, String name, String origin, 
 			String height, Integer weight, String position,
@@ -182,5 +195,33 @@ public class Players implements java.io.Serializable {
         }
 	}
 	
+	public static Players guardaJugador(SessionFactory sf, 
+			int code, String teamName, String name, String origin, 
+			String height, Integer weight, String position,
+			Integer salary) {
+		// Guarda jugador en la BD
+				
+		if ( Teams.existe(sf, name) ) { 
+			System.out.println("El jugador codigo " + code +
+					" ya existia, no se crea el jugador");
+			return null;
+		}
+		
+		Players jugador = new Players(code, name, origin, 
+				height, weight, position,
+				salary);
+
+		Transaction tx = null;
+		try ( Session session = sf.openSession() ){
+			tx = session.beginTransaction();
+			session.persist(jugador);
+			tx.commit();
+			System.out.println("\nJugador guardado en BD.\n");
+			return jugador;
+		} catch (Exception e) {
+			System.out.println("Excepcion nuevo(): " + e);
+		}
+		return null;
+	}
 	
 }
