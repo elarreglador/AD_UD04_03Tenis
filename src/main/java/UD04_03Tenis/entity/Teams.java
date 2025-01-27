@@ -189,9 +189,10 @@ public class Teams implements java.io.Serializable {
 		}
 	}
 
-	public static void crearEquipo(Scanner teclado, SessionFactory sf) {
+	public static Teams crearEquipo(Scanner teclado, SessionFactory sf) {
 		// Pregunta los datos necesarios para crear equipo y crear 
 		// objeto persistente en la base de datos.
+		// El retorno sera null si no se crea el equipo
 		
 		System.out.println("CREA UN NUEVO EQUIPO");
 		System.out.print("Introduce nombre (ID) de equipo: ");
@@ -203,17 +204,19 @@ public class Teams implements java.io.Serializable {
 		System.out.print("Introduce conference de equipo: ");
 		String conference = teclado.nextLine();
 		
-		guardaEquipo(sf, name, division, city, conference);
+		Teams equipo = guardaEquipo(sf, name, division, city, conference);
+		return equipo;
+		
 	}
 	
-	private static void guardaEquipo(SessionFactory sf, String name, String division, 
+	private static Teams guardaEquipo(SessionFactory sf, String name, String division, 
 			String city, String conference) {
 		// Guarda equipo en la BD
 				
 		if ( Teams.existe(sf, name) ) { 
 			System.out.println("El equipo " + name +
 					" ya existia, no se crea el equipo");
-			return;
+			return null;
 		}
 		
 		Teams equipo = new Teams(name, city, conference, division);
@@ -224,10 +227,13 @@ public class Teams implements java.io.Serializable {
 			session.persist(equipo);
 			tx.commit();
 			System.out.println("\nEquipo guardado en BD.\n");
+			return equipo;
 		} catch (Exception e) {
 			System.out.println("Excepcion nuevo(): " + e);
 		}
-		
+		return null;
 	}
+	
+	
 }
 
