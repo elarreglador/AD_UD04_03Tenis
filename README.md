@@ -194,9 +194,10 @@ public static void muestraJugadoresEnEquipo(
 Implementa el método crearEquipo().Este preguntará los datos necesarios para crear el equipo y crear un objeto persistente en la base de datos.
 
 ```bash
-public static void crearEquipo(Scanner teclado, SessionFactory sf) {
+public static Teams crearEquipo(Scanner teclado, SessionFactory sf) {
 	// Pregunta los datos necesarios para crear equipo y crear 
 	// objeto persistente en la base de datos.
+	// El retorno sera null si no se crea el equipo
 	
 	System.out.println("CREA UN NUEVO EQUIPO");
 	System.out.print("Introduce nombre (ID) de equipo: ");
@@ -208,17 +209,18 @@ public static void crearEquipo(Scanner teclado, SessionFactory sf) {
 	System.out.print("Introduce conference de equipo: ");
 	String conference = teclado.nextLine();
 	
-	guardaEquipo(sf, name, division, city, conference);
+	Teams equipo = guardaEquipo(sf, name, division, city, conference);
+	return equipo;
 }
 
-private static void guardaEquipo(SessionFactory sf, String name, String division, 
+private static Teams guardaEquipo(SessionFactory sf, String name, String division, 
 		String city, String conference) {
 	// Guarda equipo en la BD
 			
 	if ( Teams.existe(sf, name) ) { 
 		System.out.println("El equipo " + name +
 				" ya existia, no se crea el equipo");
-		return;
+		return null;
 	}
 	
 	Teams equipo = new Teams(name, city, conference, division);
@@ -229,9 +231,11 @@ private static void guardaEquipo(SessionFactory sf, String name, String division
 		session.persist(equipo);
 		tx.commit();
 		System.out.println("\nEquipo guardado en BD.\n");
+		return equipo;
 	} catch (Exception e) {
 		System.out.println("Excepcion nuevo(): " + e);
-	}	
+	}
+	return null;
 }
 ```
 
