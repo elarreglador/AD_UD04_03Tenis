@@ -306,6 +306,8 @@ private static Players guardaJugador(SessionFactory sf,
 
 ## 6) Crea un jugador en un equipo existente
 
+Implementa el método crearJugadorEnEquipo(). Este preguntara por los datos necesarios para crear un jugador y la ID de un equipo. El objeto creado se hará persistente en la base de datos y si no existe ningún equipo con la ID introducida se deberá mostrar un mensaje.
+
 ```bash
 public static void crearJugadorEnEquipo(Scanner teclado, 
 		SessionFactory sf) {
@@ -361,8 +363,6 @@ public static void crearJugadorEnEquipo(Scanner teclado,
 	}
 }
 ```
-
-Implementa el método crearJugadorEnEquipo(). Este preguntara por los datos necesarios para crear un jugador y la ID de un equipo. El objeto creado se hará persistente en la base de datos y si no existe ningún equipo con la ID introducida se deberá mostrar un mensaje.
 
 ## 7) Borra un jugador
 
