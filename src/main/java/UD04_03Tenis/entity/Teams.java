@@ -14,6 +14,7 @@ import javax.persistence.Table;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.hibernate.query.Query;
 
 
@@ -50,6 +51,13 @@ public class Teams implements java.io.Serializable {
 		this.division = division;
 		this.matchesesForVisitorTeam = matchesesForVisitorTeam;
 		this.matchesesForLocalTeam = matchesesForLocalTeam;}
+	
+	public Teams(String name, String city, String conference, 
+			String division) {
+		this.name = name;
+		this.city = city;
+		this.conference = conference;
+		this.division = division;}
 
 	
 	public String getName() {
@@ -181,5 +189,45 @@ public class Teams implements java.io.Serializable {
 		}
 	}
 
+	public static void crearEquipo(Scanner teclado, SessionFactory sf) {
+		// Pregunta los datos necesarios para crear equipo y crear 
+		// objeto persistente en la base de datos.
+		
+		System.out.println("CREA UN NUEVO EQUIPO");
+		System.out.print("Introduce nombre (ID) de equipo: ");
+		String name = teclado.nextLine();
+		System.out.print("Introduce division del equipo: ");
+		String division = teclado.nextLine();
+		System.out.print("Introduce ciudad de equipo: ");
+		String city = teclado.nextLine();
+		System.out.print("Introduce conference de equipo: ");
+		String conference = teclado.nextLine();
+		
+		guardaEquipo(sf, name, division, city, conference);
+	}
+	
+	private static void guardaEquipo(SessionFactory sf, String name, String division, 
+			String city, String conference) {
+		// Guarda equipo en la BD
+				
+		if ( Teams.existe(sf, name) ) { 
+			System.out.println("El equipo " + name +
+					" ya existia, no se crea el equipo");
+			return;
+		}
+		
+		Teams equipo = new Teams(name, city, conference, division);
+
+		Transaction tx = null;
+		try ( Session session = sf.openSession() ){
+			tx = session.beginTransaction();
+			session.persist(equipo);
+			tx.commit();
+			System.out.println("\nEquipo guardado en BD.\n");
+		} catch (Exception e) {
+			System.out.println("Excepcion nuevo(): " + e);
+		}
+		
+	}
 }
 

@@ -46,7 +46,7 @@ public class Main {
 						Teams.muestraJugadoresEnEquipo(teclado, sf);
 						break;
 					case 4:
-						System.out.println("opcion 4");
+						Teams.crearEquipo(teclado, sf);
 						break;
 					case 5:
 						System.out.println("opcion 5");
