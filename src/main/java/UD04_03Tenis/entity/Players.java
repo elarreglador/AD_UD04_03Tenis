@@ -223,11 +223,12 @@ public class Players implements java.io.Serializable {
 		return null;
 	}
 	
-	public static void crearJugadorYEquipo(Scanner teclado, SessionFactory sf) {
+	public static void crearJugadorYEquipo(Scanner teclado, 
+			SessionFactory sf) {
 		// pregunta por los datos necesarios para crear el jugador y el
 		// equipo y creará un objeto persistente en la base de datos
 		
-		System.out.println("CREA UN NUEVO JUGADOR ASOCIADO A UN NUEVO"
+		System.out.println("CREA UN NUEVO JUGADOR ASOCIADO A UN NUEVO "
 				+ "EQUIPO");
 		System.out.print("Introduce codigo (ID) de jugador: ");
 		int code = teclado.nextInt();
@@ -253,4 +254,63 @@ public class Players implements java.io.Serializable {
 		Players.guardaJugador(sf, code, equipo, name, origin, 
 				height, weight, position, salary);	
 	}
+	
+	
+	public static void crearJugadorEnEquipo(Scanner teclado, 
+			SessionFactory sf) {
+		
+		// pregunta por los datos necesarios para crear un jugador y la 
+		// ID de un equipo. El objeto creado se hará persistente en la 
+		// base de datos y si no existe ningún equipo con la ID 
+		// introducida se deberá mostrar un mensaje.
+		
+		System.out.println("CREA UN JUGADOR EN UN EQUIPO EXISTENTE");
+		System.out.print("Introduce nombre (ID) de EQUIPO: ");
+		String nombreEquipo = teclado.nextLine();
+		
+		if ( !Teams.existe(sf, nombreEquipo) ) {
+			System.out.println("El equipo " + nombreEquipo +
+					" no existe.");
+			return;
+		}
+		
+		System.out.print("Introduce codigo (ID) de jugador: ");
+		int code = teclado.nextInt();
+		teclado.nextLine();
+		System.out.print("Introduce origen de jugador: ");
+		String origin = teclado.nextLine();
+		System.out.print("Introduce posicion de jugador: ");
+		String position = teclado.nextLine();
+		System.out.print("Introduce salario de jugador: ");
+		Integer salary = teclado.nextInt();
+		teclado.nextLine();
+		System.out.print("Introduce altura de jugador (pies-pulgadas): ");
+		String height = teclado.nextLine();
+		System.out.print("Introduce nombre de jugador: ");
+		String name = teclado.nextLine();
+		System.out.print("Introduce peso de jugador: ");
+		Integer weight = teclado.nextInt();
+		teclado.nextLine();
+		
+		Transaction tx = null;
+		try ( Session session = sf.openSession() ){
+			tx = session.beginTransaction();
+			// Obtiene el obj equipo
+			Query<Teams> query = session.createQuery(
+					"FROM Teams T " +
+					"WHERE T.name = :nombreEquipo", Teams.class);
+			query.setParameter("nombreEquipo", nombreEquipo);
+			Teams equipo = query.uniqueResult();
+			
+			// Crear el nuevo jugador y guardar en BD
+	        Players jugador = new Players(code, equipo, name, 
+	        		origin, height, weight, position, salary);
+	        session.persist(jugador); 
+	        tx.commit();
+		}
+		
+		
+	}
+	
+	
 }

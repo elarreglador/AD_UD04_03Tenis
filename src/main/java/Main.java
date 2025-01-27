@@ -52,7 +52,7 @@ public class Main {
 						Players.crearJugadorYEquipo(teclado, sf);
 						break;
 					case 6:
-						System.out.println("opcion 6");
+						Players.crearJugadorEnEquipo(teclado, sf);
 						break;
 					case 7:
 						System.out.println("opcion 7");
