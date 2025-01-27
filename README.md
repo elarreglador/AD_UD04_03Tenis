@@ -193,7 +193,7 @@ public static void muestraJugadoresEnEquipo(
 
 Implementa el método crearEquipo().Este preguntará los datos necesarios para crear el equipo y crear un objeto persistente en la base de datos.
 
-```bash
+```java
 public static Teams crearEquipo(Scanner teclado, SessionFactory sf) {
 	// Pregunta los datos necesarios para crear equipo y crear 
 	// objeto persistente en la base de datos.
@@ -243,7 +243,7 @@ private static Teams guardaEquipo(SessionFactory sf, String name, String divisio
 
 Implementa el método crearJugadorYEquipo(). Este preguntará por los datos necesarios para crear el jugador y el equipo y creará un objeto persistente en la base de datos.
 
-```bash
+```java
 public static void crearJugadorYEquipo(Scanner teclado, SessionFactory sf) {
 	// pregunta por los datos necesarios para crear el jugador y el
 	// equipo y creará un objeto persistente en la base de datos
@@ -308,7 +308,7 @@ private static Players guardaJugador(SessionFactory sf,
 
 Implementa el método crearJugadorEnEquipo(). Este preguntara por los datos necesarios para crear un jugador y la ID de un equipo. El objeto creado se hará persistente en la base de datos y si no existe ningún equipo con la ID introducida se deberá mostrar un mensaje.
 
-```bash
+```java
 public static void crearJugadorEnEquipo(Scanner teclado, 
 		SessionFactory sf) {
 	
@@ -367,6 +367,43 @@ public static void crearJugadorEnEquipo(Scanner teclado,
 ## 7) Borra un jugador
 
 Implementa el método borrarJugador(). Este preguntara por una ID para seleccionar el jugador indicado y borrarlo de la base de datos. SI no existe ningún jugador con esa ID, se deberá mostrar un mensaje.
+
+```java
+public static void borrarJugador(Scanner teclado, 
+		SessionFactory sf) {
+	// pregunta por una ID para seleccionar el jugador indicado y 
+	// borrarlo de la base de datos. SI no existe ningún jugador con 
+	// esa ID, se deberá mostrar un mensaje.
+	
+	System.out.println("BORRA UN JUGADOR");
+	System.out.print("Indica el codigo (ID) de jugador a borrar: ");
+	int code = teclado.nextInt();
+	teclado.nextLine();
+	
+	if (!Players.existe(sf, code)) {
+		System.out.println("El jugador con codigo " + code +
+				" NO existe.");
+		return;
+	}
+
+	Transaction tx = null;
+	try (Session session = sf.openSession() ){
+		tx = session.beginTransaction();
+		Query<?> query = session.createQuery(
+		        "DELETE "
+		        + "FROM Players P "
+		        + "WHERE P.code = :code");
+		query.setParameter("code", code);
+	    int filasBorradas = query.executeUpdate();
+	    tx.commit();
+	    
+	    System.out.println("Filas afectadas: " + filasBorradas);
+	    System.out.println("Eliminado Player code: " + code + "\n");
+	} catch (Exception e) {
+		System.out.println("Excepcion borrarJugador(): " + e);
+	}
+}
+```
 
 ## 8) Borra un equipo
 
