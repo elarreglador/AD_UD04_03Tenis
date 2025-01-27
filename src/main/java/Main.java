@@ -34,6 +34,7 @@ public class Main {
 		try ( SessionFactory sf = HibernateUtil.getSessionFactory() ){
 			do {
 				// usamos switch para gestionar la respuesta del menu
+				System.out.println();
 				switch (Menu.menu(opciones, teclado)) {
 					// no hay un case 0
 					case 1:
@@ -55,7 +56,7 @@ public class Main {
 						Players.crearJugadorEnEquipo(teclado, sf);
 						break;
 					case 7:
-						System.out.println("opcion 7");
+						Players.borrarJugador(teclado, sf);
 						break;
 					case 8:
 						System.out.println("opcion 8");

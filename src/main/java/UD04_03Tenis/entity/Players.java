@@ -150,7 +150,8 @@ public class Players implements java.io.Serializable {
 	        // Realizamos la consulta para verificar si 
 	    	// existe un jugador con ese nombre
 	    	Query<Long> query = session.createQuery(
-	                "SELECT COUNT(P) FROM Players P WHERE P.code = :code", Long.class);
+	                "SELECT COUNT(P) FROM Players P WHERE P.code = :code",
+	                Long.class);
             query.setParameter("code", code);
 
             // Devuelve el número de coincidencias
@@ -158,7 +159,8 @@ public class Players implements java.io.Serializable {
             // Existe si el conteo es mayor que 0
             return count != null && count > 0; 
 	    } catch (Exception e) {
-	        System.err.println("Error al verificar la existencia del equipo: " + e.getMessage());
+	        System.err.println("Error al verificar la existencia "
+	        		+ "del equipo: " + e.getMessage());
 	        e.printStackTrace();
 	    }
 	    return false;
@@ -309,6 +311,42 @@ public class Players implements java.io.Serializable {
 	        tx.commit();
 		}
 		
+		System.out.println();
+	}
+	
+	public static void borrarJugador(Scanner teclado, 
+			SessionFactory sf) {
+		// pregunta por una ID para seleccionar el jugador indicado y 
+		// borrarlo de la base de datos. SI no existe ningún jugador con 
+		// esa ID, se deberá mostrar un mensaje.
+		
+		System.out.println("BORRA UN JUGADOR");
+		System.out.print("Indica el codigo (ID) de jugador a borrar: ");
+		int code = teclado.nextInt();
+		teclado.nextLine();
+		
+		if (!Players.existe(sf, code)) {
+			System.out.println("El jugador con codigo " + code +
+					" NO existe.");
+			return;
+		}
+
+		Transaction tx = null;
+		try (Session session = sf.openSession() ){
+			tx = session.beginTransaction();
+			Query<?> query = session.createQuery(
+			        "DELETE "
+			        + "FROM Players P "
+			        + "WHERE P.code = :code");
+			query.setParameter("code", code);
+		    int filasBorradas = query.executeUpdate();
+		    tx.commit();
+		    
+		    System.out.println("Filas afectadas: " + filasBorradas);
+		    System.out.println("Eliminado Player code: " + code + "\n");
+		} catch (Exception e) {
+			System.out.println("Excepcion borrarJugador(): " + e);
+		}
 		
 	}
 	
