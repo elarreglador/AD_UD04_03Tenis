@@ -243,6 +243,67 @@ private static Teams guardaEquipo(SessionFactory sf, String name, String divisio
 
 Implementa el método crearJugadorYEquipo(). Este preguntará por los datos necesarios para crear el jugador y el equipo y creará un objeto persistente en la base de datos.
 
+```bash
+public static void crearJugadorYEquipo(Scanner teclado, SessionFactory sf) {
+	// pregunta por los datos necesarios para crear el jugador y el
+	// equipo y creará un objeto persistente en la base de datos
+	
+	System.out.println("CREA UN NUEVO JUGADOR ASOCIADO A UN NUEVO"
+			+ "EQUIPO");
+	System.out.print("Introduce codigo (ID) de jugador: ");
+	int code = teclado.nextInt();
+	teclado.nextLine();
+	System.out.print("Introduce origen de jugador: ");
+	String origin = teclado.nextLine();
+	System.out.print("Introduce posicion de jugador: ");
+	String position = teclado.nextLine();
+	System.out.print("Introduce salario de jugador: ");
+	Integer salary = teclado.nextInt();
+	teclado.nextLine();
+	System.out.print("Introduce altura de jugador (pies-pulgadas): ");
+	String height = teclado.nextLine();
+	System.out.print("Introduce nombre de jugador: ");
+	String name = teclado.nextLine();
+	System.out.print("Introduce peso de jugador: ");
+	Integer weight = teclado.nextInt();
+	teclado.nextLine();
+	
+	// crea el equipo y me devuelve el objeto creado
+	Teams equipo = Teams.crearEquipo(teclado, sf);
+			
+	Players.guardaJugador(sf, code, equipo, name, origin, 
+			height, weight, position, salary);	
+}
+
+private static Players guardaJugador(SessionFactory sf, 
+		int code, Teams equipo, String name, String origin, 
+		String height, Integer weight, String position,
+		Integer salary) {
+	// Guarda jugador en la BD
+			
+	if ( Teams.existe(sf, name) ) { 
+		System.out.println("El jugador codigo " + code +
+				" ya existia, no se crea el jugador");
+		return null;
+	}
+	
+	Players jugador = new Players(code, equipo, name, origin, 
+			height, weight, position, salary);
+
+	Transaction tx = null;
+	try ( Session session = sf.openSession() ){
+		tx = session.beginTransaction();
+		session.persist(jugador);
+		tx.commit();
+		System.out.println("\nJugador guardado en BD.\n");
+		return jugador;
+	} catch (Exception e) {
+		System.out.println("Excepcion nuevo(): " + e);
+	}
+	return null;
+}
+```
+
 ## 6) Crea un jugador en un equipo existente
 
 Implementa el método crearJugadorEnEquipo(). Este preguntara por los datos necesarios para crear un jugador y la ID de un equipo. El objeto creado se hará persistente en la base de datos y si no existe ningún equipo con la ID introducida se deberá mostrar un mensaje.
