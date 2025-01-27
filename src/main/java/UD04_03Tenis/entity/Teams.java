@@ -206,7 +206,6 @@ public class Teams implements java.io.Serializable {
 		
 		Teams equipo = guardaEquipo(sf, name, division, city, conference);
 		return equipo;
-		
 	}
 	
 	private static Teams guardaEquipo(SessionFactory sf, String name, String division, 

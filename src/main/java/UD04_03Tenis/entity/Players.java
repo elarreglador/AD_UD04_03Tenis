@@ -131,6 +131,26 @@ public class Players implements java.io.Serializable {
 				"\n salario = " + this.getSalary();
 		}
 	
+	public static boolean existe(SessionFactory sf, Integer code) {
+	    // Verifica si existe un jugador
+	    try (Session session = sf.openSession()) {
+	        // Realizamos la consulta para verificar si 
+	    	// existe un jugador con ese nombre
+	    	Query<Long> query = session.createQuery(
+	                "SELECT COUNT(P) FROM Players P WHERE P.code = :code", Long.class);
+            query.setParameter("code", code);
+
+            // Devuelve el número de coincidencias
+            Long count = query.uniqueResult(); 
+            // Existe si el conteo es mayor que 0
+            return count != null && count > 0; 
+	    } catch (Exception e) {
+	        System.err.println("Error al verificar la existencia del equipo: " + e.getMessage());
+	        e.printStackTrace();
+	    }
+	    return false;
+	}
+	
 	public static void muestraJugador(Scanner teclado, SessionFactory sf) {
 		/*
 		 Preguntará por la ID de un jugador y mostrará la información por
@@ -161,5 +181,6 @@ public class Players implements java.io.Serializable {
             e.printStackTrace();
         }
 	}
-
+	
+	
 }
