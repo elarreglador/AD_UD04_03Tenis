@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -16,7 +17,6 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.query.Query;
-
 
 @Entity
 @Table(name = "teams", catalog = "NBA")
@@ -109,15 +109,20 @@ public class Teams implements java.io.Serializable {
 	public static boolean existe(SessionFactory sf, String name) {
 	    // Verifica si existe un equipo
 	    try (Session session = sf.openSession()) {
-	        // Realizamos la consulta para verificar si existe un equipo con ese nombre
+	        // Realizamos la consulta para verificar si 
+	    	// existe un equipo con ese nombre
 	    	Query<Long> query = session.createQuery(
-	                "SELECT COUNT(T) FROM Teams T WHERE T.name = :name", Long.class);
+	                "SELECT COUNT(T) "
+	                + "FROM Teams T "
+	                + "WHERE T.name = :name", Long.class);
 	            query.setParameter("name", name);
-
-	            Long count = query.uniqueResult(); // Devuelve el número de coincidencias
-	            return count != null && count > 0; // Existe si el conteo es mayor que 0
+	            // Devuelve el número de coincidencias
+	            Long count = query.uniqueResult(); 
+	            // Existe si el conteo es mayor que 0
+	            return count != null && count > 0; 
 	    } catch (Exception e) {
-	        System.err.println("Error al verificar la existencia del equipo: " + e.getMessage());
+	        System.err.println("Error al verificar la existencia del "
+	        		+ "equipo: " + e.getMessage());
 	        e.printStackTrace();
 	    }
 	    return false;
@@ -208,8 +213,8 @@ public class Teams implements java.io.Serializable {
 		return equipo;
 	}
 	
-	private static Teams guardaEquipo(SessionFactory sf, String name, String division, 
-			String city, String conference) {
+	private static Teams guardaEquipo(SessionFactory sf, String name, 
+			String division, String city, String conference) {
 		// Guarda equipo en la BD
 				
 		if ( Teams.existe(sf, name) ) { 
@@ -233,6 +238,116 @@ public class Teams implements java.io.Serializable {
 		return null;
 	}
 	
-	
+	public static void borrarEquipo(SessionFactory sf, Scanner teclado) {
+		// pregunta por el ID de un equipo y lo borra de la base de datos. 
+		// Si no existe ningún equipo con ese ID, mostrara un mensaje.
+		// Si existen jugadores asociados a ese equipo, este no se 
+		// puede borrar hasta que se hayan borrado los jugadores, 
+		// se deberá mostrar un mensaje para confirmar la eliminación 
+		// de los jugadores.
+		
+	    System.out.println("BORRA UN EQUIPO");
+	    System.out.print("Introduce nombre (ID) de equipo: ");
+	    String teamName = teclado.nextLine();
+
+	    if (!Teams.existe(sf, teamName)) {
+	        System.out.println("El equipo " + teamName + " NO existe");
+	        return;
+	    }
+
+	    Session session = null;
+	    Transaction tx = null;
+
+	    try {
+	        session = sf.openSession();
+	        tx = session.beginTransaction();
+
+	        // Verificar si hay jugadores asociados al equipo
+	        Query<Long> query = session.createQuery(
+	                "SELECT COUNT(P) "
+	                + "FROM Players P "
+	                + "WHERE P.teams.name = :teamName", Long.class);
+	        query.setParameter("teamName", teamName);
+	        Long numPlayers = query.uniqueResult();
+
+	        if (numPlayers > 0) {
+	            boolean continuar = false;
+	            do {
+	                System.out.print("\nSe borrarán también "
+	                		+ "los resultados de partidos, estadisticas, "
+	                		+ "y los jugadores de este equipo. "
+	                		+ "Continuar (s/n): ");
+	                String opcion = teclado.nextLine();
+	                if (opcion.equalsIgnoreCase("n")) {
+	                    System.out.println("Operación cancelada.");
+	                    return;
+	                } else if (opcion.equalsIgnoreCase("s")) {
+	                    continuar = true;
+	                }
+	            } while (!continuar);
+	        }
+	        
+	        // Borrrar registros en Matches asociados al equipo
+	        Query<?> deleteMatchesQuery1 = session.createQuery(
+	        		"DELETE "
+	        		+ "FROM Matches M "
+	        		+ "WHERE M.teamsByVisitorTeam.name = :teamName");
+	        deleteMatchesQuery1.setParameter("teamName", teamName);
+	        int MatchesEliminados = deleteMatchesQuery1.executeUpdate();
+	        
+	        Query<?> deleteMatchesQuery2 = session.createQuery(
+	        		"DELETE "
+	        		+ "FROM Matches M "
+	        		+ "WHERE M.teamsByLocalTeam.name = :teamName");
+	        deleteMatchesQuery2.setParameter("teamName", teamName);
+	        MatchesEliminados = 
+	        		MatchesEliminados + deleteMatchesQuery2.executeUpdate();
+
+	        // Borrar registros en Stats asociados a los jugadores del equipo
+	        Query<?> deleteStatsQuery = session.createQuery(
+	        		"DELETE "
+	        		+ "FROM Stats S "
+	        		+ "WHERE S.players.code IN (" 
+	        	    + "	  SELECT P.code "
+	        	    + "	  FROM Players P "
+	        	    + "   WHERE P.teams.name = :teamName"
+	        	    + ")");
+	        deleteStatsQuery.setParameter("teamName", teamName);
+	        int statsEliminados = deleteStatsQuery.executeUpdate();
+
+	        // Borrar jugadores asociados al equipo
+	        Query<?> deletePlayersQuery = session.createQuery(
+	                "DELETE "
+	                + "FROM Players P "
+	                + "WHERE P.teams.name = :teamName");
+	        deletePlayersQuery.setParameter("teamName", teamName);
+	        int jugadoresEliminados = deletePlayersQuery.executeUpdate();
+
+	        // Borrar el equipo
+	        Query<?> deleteTeamQuery = session.createQuery(
+	                "DELETE "
+	                + "FROM Teams T "
+	                + "WHERE T.name = :teamName");
+	        deleteTeamQuery.setParameter("teamName", teamName);
+	        int equiposEliminados = deleteTeamQuery.executeUpdate();
+	        
+	        tx.commit();
+
+	        System.out.println("Match eliminados: " + MatchesEliminados);
+	        System.out.println("Stats eliminados: " + statsEliminados);
+	        System.out.println("Jugadores eliminados: " + jugadoresEliminados);
+	        System.out.println("Equipos eliminados: " + equiposEliminados);
+	    } catch (Exception e) {
+	        if (tx != null) {
+	            tx.rollback();
+	        }
+	        System.out.println("Excepción borrarEquipo(): " + e.getMessage());
+	    } finally {
+	        if (session != null && session.isOpen()) {
+	            session.close();
+	        }
+	    }
+	}
+
 }
 

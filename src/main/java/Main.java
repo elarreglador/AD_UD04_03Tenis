@@ -59,7 +59,7 @@ public class Main {
 						Players.borrarJugador(teclado, sf);
 						break;
 					case 8:
-						System.out.println("opcion 8");
+						Teams.borrarEquipo(sf, teclado);
 						break;
 					case 9:
 						System.out.println("opcion 9");

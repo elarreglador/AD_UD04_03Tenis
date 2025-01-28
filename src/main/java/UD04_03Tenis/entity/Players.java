@@ -325,6 +325,10 @@ public class Players implements java.io.Serializable {
 		int code = teclado.nextInt();
 		teclado.nextLine();
 		
+		Players.borrarJugadorCode(sf, code);
+	}
+	
+	public static void borrarJugadorCode(SessionFactory sf, int code) {
 		if (!Players.existe(sf, code)) {
 			System.out.println("El jugador con codigo " + code +
 					" NO existe.");
