@@ -354,5 +354,21 @@ public class Players implements java.io.Serializable {
 		
 	}
 	
-	
+	public static void estableceSalario(SessionFactory sf, 
+			Players jugador, int salario) {
+		jugador.setSalary(salario);
+		Transaction tx = null;
+		try (Session session = sf.openSession() ){
+			tx = session.getTransaction();
+			session.persist(jugador);
+			tx.commit();
+			System.out.println("\nSalario de jugador actualizado");
+		} catch (Exception e) {
+			System.out.println("Excepcion estableceSalario(): " + e);
+		}
+	}
 }
+
+
+
+
