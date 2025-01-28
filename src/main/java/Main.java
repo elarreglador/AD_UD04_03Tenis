@@ -62,7 +62,7 @@ public class Main {
 						Teams.borrarEquipo(sf, teclado);
 						break;
 					case 9:
-						System.out.println("opcion 9");
+						Teams.establecerSalarioEquipo(teclado, sf);
 						break;
 					case 10:
 						System.out.println("opcion 10");
