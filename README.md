@@ -409,6 +409,119 @@ public static void borrarJugador(Scanner teclado,
 
 Implementa el método borrarEquipo(). Este preguntará por el ID de un equipo y lo borrará de la base de datos. Si no existe ningún equipo con ese ID, un mensaje deberá ser mostrado. Si existen jugadores asociados a ese equipo, este no se puede borrar hasta que se hayan borrado los jugadores, se deberá mostrar un mensaje para confirmar la eliminación de los jugadores.
 
+```java
+public static void borrarEquipo(SessionFactory sf, Scanner teclado) {
+	// pregunta por el ID de un equipo y lo borra de la base de datos. 
+	// Si no existe ningún equipo con ese ID, mostrara un mensaje.
+	// Si existen jugadores asociados a ese equipo, este no se 
+	// puede borrar hasta que se hayan borrado los jugadores, 
+	// se deberá mostrar un mensaje para confirmar la eliminación 
+	// de los jugadores.
+	
+    System.out.println("BORRA UN EQUIPO");
+    System.out.print("Introduce nombre (ID) de equipo: ");
+    String teamName = teclado.nextLine();
+
+    if (!Teams.existe(sf, teamName)) {
+        System.out.println("El equipo " + teamName + " NO existe");
+        return;
+    }
+
+    Session session = null;
+    Transaction tx = null;
+
+    try {
+        session = sf.openSession();
+        tx = session.beginTransaction();
+
+        // Verificar si hay jugadores asociados al equipo
+        Query<Long> query = session.createQuery(
+                "SELECT COUNT(P) "
+                + "FROM Players P "
+                + "WHERE P.teams.name = :teamName", Long.class);
+        query.setParameter("teamName", teamName);
+        Long numPlayers = query.uniqueResult();
+
+        if (numPlayers > 0) {
+            boolean continuar = false;
+            do {
+                System.out.print("\nSe borrarán también "
+                		+ "los resultados de partidos, estadisticas, "
+                		+ "y los jugadores de este equipo. "
+                		+ "Continuar (s/n): ");
+                String opcion = teclado.nextLine();
+                if (opcion.equalsIgnoreCase("n")) {
+                    System.out.println("Operación cancelada.");
+                    return;
+                } else if (opcion.equalsIgnoreCase("s")) {
+                    continuar = true;
+                }
+            } while (!continuar);
+        }
+        
+        // Borrrar registros en Matches asociados al equipo
+        Query<?> deleteMatchesQuery1 = session.createQuery(
+        		"DELETE "
+        		+ "FROM Matches M "
+        		+ "WHERE M.teamsByVisitorTeam.name = :teamName");
+        deleteMatchesQuery1.setParameter("teamName", teamName);
+        int MatchesEliminados = deleteMatchesQuery1.executeUpdate();
+        
+        Query<?> deleteMatchesQuery2 = session.createQuery(
+        		"DELETE "
+        		+ "FROM Matches M "
+        		+ "WHERE M.teamsByLocalTeam.name = :teamName");
+        deleteMatchesQuery2.setParameter("teamName", teamName);
+        MatchesEliminados = 
+        		MatchesEliminados + deleteMatchesQuery2.executeUpdate();
+
+        // Borrar registros en Stats asociados a los jugadores del equipo
+        Query<?> deleteStatsQuery = session.createQuery(
+        		"DELETE "
+        		+ "FROM Stats S "
+        		+ "WHERE S.players.code IN (" 
+        	    + "	  SELECT P.code "
+        	    + "	  FROM Players P "
+        	    + "   WHERE P.teams.name = :teamName"
+        	    + ")");
+        deleteStatsQuery.setParameter("teamName", teamName);
+        int statsEliminados = deleteStatsQuery.executeUpdate();
+
+        // Borrar jugadores asociados al equipo
+        Query<?> deletePlayersQuery = session.createQuery(
+                "DELETE "
+                + "FROM Players P "
+                + "WHERE P.teams.name = :teamName");
+        deletePlayersQuery.setParameter("teamName", teamName);
+        int jugadoresEliminados = deletePlayersQuery.executeUpdate();
+
+        // Borrar el equipo
+        Query<?> deleteTeamQuery = session.createQuery(
+                "DELETE "
+                + "FROM Teams T "
+                + "WHERE T.name = :teamName");
+        deleteTeamQuery.setParameter("teamName", teamName);
+        int equiposEliminados = deleteTeamQuery.executeUpdate();
+        
+        tx.commit();
+
+        System.out.println("Match eliminados: " + MatchesEliminados);
+        System.out.println("Stats eliminados: " + statsEliminados);
+        System.out.println("Jugadores eliminados: " + jugadoresEliminados);
+        System.out.println("Equipos eliminados: " + equiposEliminados);
+    } catch (Exception e) {
+        if (tx != null) {
+            tx.rollback();
+        }
+        System.out.println("Excepción borrarEquipo(): " + e.getMessage());
+    } finally {
+        if (session != null && session.isOpen()) {
+            session.close();
+        }
+    }
+}
+```
+
 ## 9) Establece el salario de todos los jugadores de un equipo
 
 Implementa el método establecerSalarioEquipo(). Este preguntará por el ID de un equipo y modificará el salario de los jugadores de éste a la cantidad que se establezca por pantalla. Si no existe ningún equipo con esa ID se deberá mostrar un mensaje por pantalla.
