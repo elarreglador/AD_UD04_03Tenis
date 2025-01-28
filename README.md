@@ -526,6 +526,52 @@ public static void borrarEquipo(SessionFactory sf, Scanner teclado) {
 
 Implementa el método establecerSalarioEquipo(). Este preguntará por el ID de un equipo y modificará el salario de los jugadores de éste a la cantidad que se establezca por pantalla. Si no existe ningún equipo con esa ID se deberá mostrar un mensaje por pantalla.
 
+```java
+public static void establecerSalarioEquipo(
+			Scanner teclado, SessionFactory sf) {
+		// pregunta por el ID de un equipo y modificará el salario de los 
+		// jugadores de éste a la cantidad que se establezca por pantalla. 
+		// Si no existe ningún equipo con esa ID se deberá mostrar un 
+		// mensaje por pantalla.
+		
+		System.out.println("ESTABLECE EL SALARIO DE TODOS LOS JUGADORES"
+				+ "DE UN EQUIPO");
+		System.out.print("Introduce nombre (ID) de equipo: ");
+		String name = teclado.nextLine();
+		
+		if (!Teams.existe(sf, name) ) {
+			System.out.println("El equipo " + name + " NO existe.");
+			return;
+		}
+		
+		Transaction tx = null;
+		try ( Session session = sf.openSession() ){
+			tx = session.beginTransaction();
+			
+			Query<Players> query = session.createQuery(
+					"FROM Players P "
+					+ "WHERE P.teams.name = :team", Players.class);
+			query.setParameter("team", name);
+			List<Players> jugadores = query.list();
+			
+			System.out.println();
+			int salario;
+			for (Players jugador : jugadores) {
+				System.out.print("Nuevo salario para " + jugador.getName() + ": ");
+				salario = teclado.nextInt();
+				teclado.nextLine();
+				jugador.setSalary(salario);
+				System.out.println(
+						"Actualizado salario de " + jugador.getName());
+			}
+			tx.commit();
+			
+		} catch (Exception e) {
+			System.out.println("Excepcion: "+ e);
+		}
+	}
+```
+
 ## 10) Aumenta el salario de los mejores jugadores de un equipo en la temporada 07/08
 
 Implementa el método subirSalarioMejoresJugadoresEquipo(). Este preguntara por la ID de un equipo, por el porcentaje del aumento que se va aplicar, y cual es la estadística a tener en cuenta. El salario de los jugadores con los máximos en esa estadística se debe incrementar. Si no existe ningún equipo con esa ID se deberá mostrar un mensaje por pantalla.
