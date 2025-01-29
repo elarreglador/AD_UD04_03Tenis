@@ -577,6 +577,115 @@ public static void establecerSalarioEquipo(
 Implementa el método subirSalarioMejoresJugadoresEquipo(). Este preguntara por la ID de un equipo, por el porcentaje del aumento que se va aplicar, y cual es la estadística a tener en cuenta. El salario de los jugadores con los máximos en esa estadística se debe incrementar. Si no existe ningún equipo con esa ID se deberá mostrar un mensaje por pantalla.
 
 Por ejemplo, si la ID del equipo es ‘Timberwolves’, el porcentaje de aumento es un 10% y la estadística seleccionada es ‘points per match’, el nuevo salario del jugador 7 – Al Jefferson pasará a ser 110000.
+```java
+public static void subirSalarioMejoresJugadoresEquipo(Scanner teclado, 
+		SessionFactory sf) {
+	// pregunta por la ID de un equipo, por el porcentaje de aumento 
+	// que se va aplicar, y cual es la estadística a tener en cuenta. 
+	// El salario de los jugadores con los máximos en esa estadística 
+	// se debe incrementar. 
+	// Si no existe ningún equipo con esa ID se mostrara un mensaje.
+	
+    System.out.println("SUBIR SALARIO A LOS MEJORES JUGADORES "
+    		+ "DE UN EQUIPO");
+    
+    Transaction tx = null;
+    try (Session session = sf.openSession() ) {
+        tx = session.beginTransaction();
+	    System.out.print("Introduce nombre (ID) de equipo: ");
+	    String teamName = teclado.nextLine();
+
+	    if (!Teams.existe(sf, teamName)) {
+	        System.out.println("El equipo " + teamName + 
+	        		" NO existe.");
+	        return;
+	    }
+
+	    System.out.print("Introduce el porcentaje de "
+	    		+ "aumento (sin %): ");
+	    double porcentajeAumento = teclado.nextInt();
+	    teclado.nextLine();
+	    porcentajeAumento = porcentajeAumento / 100;
+
+	    List<String> estadisticasValidas = Arrays.asList(
+	    		"pointsPerMatch", "assistancesPerMatch", 
+	    		"blocksPerMatch", "reboundPerMatch");
+	    
+	    // Pide estadistica y verifica
+	    boolean continuar = false;
+	    String estadistica;
+	    do {
+		    System.out.print("Introduce la estadística a considerar \n"
+		    		+ "(pointsPerMatch, assistancesPerMatch, "
+		    		+ "blocksPerMatch, reboundPerMatch): \n");
+		    estadistica = teclado.nextLine();
+	
+		    if (!estadisticasValidas.contains(estadistica)) {
+		        System.out.println("Estadística no válida. Usa: "
+		        		+ "pointsPerMatch, assistancesPerMatch, "
+		        		+ "blocksPerMatch o reboundPerMatch");
+		    } else {
+		    	continuar = !continuar;
+		    }
+	    } while (!continuar);
+
+        // Obtener el máximo valor de la estadística en el equipo
+	    System.out.println("Revisando " + estadistica + " ...");
+        String maxQueryStr = 
+        		"SELECT MAX(S." + estadistica + ") "
+        		+ "FROM Stats S "
+        		+ "WHERE S.players.teams.name = :teamName";
+        Query<Float> maxQuery = session.createQuery(maxQueryStr, 
+        		Float.class);
+        maxQuery.setParameter("teamName", teamName);
+        Float maxValor = maxQuery.uniqueResult();
+        System.out.println("La maxima estadistica es " + maxValor);
+
+        if (maxValor == null) {
+            System.out.println(
+            		"No hay estadísticas para los " + teamName);
+            return;
+        }
+
+        // Obtener los jugadores con el máximo valor en la estadística
+        System.out.println("Obteniendo jugadores de máximo valor...");
+        String playerQueryStr = 
+        		"SELECT S.players "
+        		+ "FROM Stats S "
+        		+ "WHERE ABS("
+        		+ "   S." + estadistica + " - :maxValor) < 0.0001 "
+        		+ "AND S.players.teams.name = :teamName ";
+		// WHERE S." + estadistica + " = :maxValor no encuentra al
+        // jugador por ajuste de valor en valores decimales
+
+
+        Query<Players> playerQuery = session.createQuery(
+        		playerQueryStr, Players.class);
+        playerQuery.setParameter("teamName", teamName);
+        playerQuery.setParameter("maxValor", maxValor);
+        List<Players> mejoresJugadores = playerQuery.list();
+
+        System.out.println(mejoresJugadores.size() + 
+        		" jugadores afectados:");
+        for (Players jugador : mejoresJugadores) {
+            double nuevoSalario = 
+            		jugador.getSalary() * (1 + porcentajeAumento);
+            jugador.setSalary((int) nuevoSalario);
+            session.update(jugador);
+            System.out.println(
+            		"Nuevo salario para " + jugador.getName() 
+            		+ ": " + (int) nuevoSalario);
+        }
+        tx.commit();
+        
+    } catch (Exception e) {
+        if (tx != null) {
+            tx.rollback();
+        }
+        System.out.println("Excepción: " + e.getMessage() );
+    }
+}
+```
 
 ## 11) Salir
 
