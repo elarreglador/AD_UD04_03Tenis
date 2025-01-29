@@ -65,7 +65,8 @@ public class Main {
 						Teams.establecerSalarioEquipo(teclado, sf);
 						break;
 					case 10:
-						System.out.println("opcion 10");
+						Teams.subirSalarioMejoresJugadoresEquipo(
+								teclado, sf);
 						break;
 					case 11:
 						salir = true;
